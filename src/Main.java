@@ -11,17 +11,18 @@ public class Main {
 
         String string = "var a , b: integer; \n " + "  c: real; \n" +
                 "begin \n" +
-                "    c := 20 / 20.0; \n" +
-                "  \n"+
-//                "    while ( (b + 6) < (a + (20.0 *3 + f)) ) do \n" +
-//                "        begin \n" +
-//                "            a:=4;  \n" +
-//                "            b:= 6 + (a * b); \n" +
-//                "        end; \n" +
+//                "    a := 20; \n" +
+//                "  \n"+
+                "    while ( (b) < (a + 5) ) do \n" +
+                "        begin \n" +
+                "            a:=4;  \n" +
+                "            b:= 6 + (a * 1); \n" +
+                "        end; \n" +
 //                "for i:=1 to n do \n" +
-//                "    a:=i; \n" +
-//                "if ((90+30)/(7+5)> hj) then \n" +
-//                "        k := a; \n" +
+//                "    c:= (90+30)/(7+5); \n" +
+
+//                "if ((90+30)/(7+5) < a) then \n" +
+//                "        b := a; \n" +
 //                "        sd := 6;\n" +
                 "end.";
 //        String string = "begin u := a + (b + (k*h) + o) + d + g; end.";
@@ -38,7 +39,10 @@ public class Main {
         Parser parser = new Parser(commands, types);
         parser.parse();
         Simantic s = new Simantic(parser.getNodes());
-        s.simanticParse();
+        s.intialization();
+        s.simanticParse(10);
+//        System.out.println(s.simanticParse());
+//        System.out.println(s.simanticParse());
 
 
 

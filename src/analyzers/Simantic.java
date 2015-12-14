@@ -29,7 +29,7 @@ public class Simantic {
 
     int blockEnd = 10;
 
-    public void simanticParse() {
+    public void intialization() {
         for (int i = 0; i < nodes.size(); i++) {
             if (nodes.getRow(i).getFunctional() == -1) {
                 root.add(i);
@@ -48,21 +48,54 @@ public class Simantic {
             Table temp = nodes.findByFunctional(idVarTypes.get(i));
             initilize(temp);
         }
-        for (int i = 0; i < idBeginTypes.size(); i += 2) {
-            Table t = nodes.findByFunctional(idBeginTypes.get(i));
-//            blockEnd = idBeginTypes.get(i + 1);
-            parseTable(nodes.findById(idBeginTypes.get(i)).getRow(0));
+    }
+
+    public void simanticParse(int subParentId) {
+        idBeginTypes = new ArrayList<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.getRow(i).getFunctional() == subParentId) {
+                idBeginTypes.add(i);
+            }
         }
 
+        for (int i = 0; i < idBeginTypes.size(); i += 2) {
+            int d = subParentId;
+            String k = "";
+            boolean b = false;
+            if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals("while")) {
+                b = parseContition(nodes.findByFunctional(idBeginTypes.get(i)).getRow(0));
+                System.out.println(b);
+                d = i + 1;
+                if (nodes.findById(idBeginTypes.get(d) + 1).getRow(0).getKey().equals("begin")) {
+                    for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
+                        k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
+                    }
+                } else {
+                    parseTable2(nodes.findByFunctional(idBeginTypes.get(d)).getRow(0), idBeginTypes.get(d));
 
-        for (int i = 0; i < idVarTypes.size(); i++) {
+                }
+            } else if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals("if")) {
+                b = parseContition(nodes.findByFunctional(idBeginTypes.get(i)).getRow(0));
+                System.out.println(b);
+                d = i + 1;
+                if (nodes.findById(idBeginTypes.get(d) + 1).getRow(0).getKey().equals("begin")) {
+                    for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
+                        k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
+                    }
+                } else {
+                    parseTable2(nodes.findByFunctional(idBeginTypes.get(d)).getRow(0), idBeginTypes.get(d));
 
+                }
+            } else {
+                k = parseTable(nodes.findById(idBeginTypes.get(i)).getRow(0));
+            }
+//                System.out.println(k);
         }
         for (Map.Entry<String, Integer> m : integer.entrySet()) {
-            System.out.println(m.getKey() + "   " + m.getValue());
+            System.out.println(m.getKey() + " " + m.getValue());
         }
         for (Map.Entry<String, Double> m : real.entrySet()) {
-            System.out.println(m.getKey() + "   " + m.getValue());
+            System.out.println(m.getKey() + " " + m.getValue());
         }
     }
 
@@ -83,8 +116,84 @@ public class Simantic {
 
     }
 
+    boolean parseContition(RowOfTable conditionRow) {
+        boolean result = false;
+        String condition = conditionRow.getKey();
+        Table t = nodes.findByFunctional(conditionRow.getId());
+        String left = parseTable2(t.getRow(0), conditionRow.getId());
+        String right = parseTable2(t.getRow(1), conditionRow.getId());
+        Double leftValue = Double.parseDouble(parseValue(left));
+        Double rightValue = Double.parseDouble(parseValue(right));
+        if (condition.equals(Symbols.LESS.string)) {
+            result = leftValue < rightValue;
+        }
+        return result;
+    }
+
+    String parseValue(String value) {
+        String leftName;
+        Number leftValue = null;
+        matcher = pattern.matcher(value);
+        if (matcher.matches()) {
+            if (integer.containsKey(value)) { // есть в мапе интежеров
+                leftName = value;
+                leftValue = integer.get(leftName);
+            } else if (real.containsKey(value)) { // есть в мапе real
+                leftName = value;
+                leftValue = real.get(leftName);
+            } else {
+// System.exit(-1);
+                System.out.println("problem in matcher");
+            }
+        } else {
+            if (value.contains(".")) {
+                leftValue = Double.parseDouble(value);
+            } else {
+                leftValue = Integer.parseInt(value);
+            }
+        }
+        return leftValue.toString();
+    }
+
+
+    String parseTable2(RowOfTable table, int finish) {
+        Table t = nodes.findByFunctional(table.getId());
+        RowOfTable parent;
+        if (t.size() > 0) {
+            if (nodes.findByFunctional(t.getRow(0).getId()).size() > 0) {
+                parseTable2(t.getRow(0), finish);
+            } else if (nodes.findByFunctional(t.getRow(1).getId()).size() > 0) {
+                parseTable2(t.getRow(1), finish);
+            } else parseTable2(t.getRow(0), finish);
+        } else if (table.getFunctional() == finish) {
+            return table.getKey();
+        } else {
+            RowOfTable childTable = nodes.findById(table.getFunctional()).getRow(0);
+            Table childList = nodes.findByFunctional(childTable.getId());
+            String s;
+            if (childList.getRow(0) == table) {
+                if (nodes.findByFunctional(childList.getRow(1).getId()).size() > 0){
+                    parseTable2(childTable, finish);
+                    return childTable.getKey();
+                }
+                s = mathOperation(table, nodes.findByFunctional(table.getFunctional()).getRow(1), nodes.findById(table.getFunctional()).getRow(0).getKey());
+            } else {
+                s = mathOperation(nodes.findByFunctional(table.getFunctional()).getRow(0), table, nodes.findById(table.getFunctional()).getRow(0).getKey());
+            }
+            parent = nodes.findById(table.getFunctional()).getRow(0);
+            parent.setKey(s);
+            int childParent = table.getFunctional();
+            nodes.removeRow(nodes.findByFunctional(childParent).getRow(0).getId());
+            nodes.removeRow(nodes.findByFunctional(childParent).getRow(0).getId());
+
+            parseTable2(parent, finish);
+
+        }
+        return table.getKey();
+    }
+
     //функция для проверки ли это листья
-    void parseTable(RowOfTable table) {
+    String parseTable(RowOfTable table) {
         Table t = nodes.findByFunctional(table.getId());
         RowOfTable parent;
         if (t.size() > 0) {
@@ -94,12 +203,16 @@ public class Simantic {
                 parseTable(t.getRow(1));
             } else parseTable(t.getRow(0));
         } else if (table.getFunctional() == funcBegin) {
-            return;
+            return table.getKey();
         } else {
             RowOfTable childTable = nodes.findById(table.getFunctional()).getRow(0);
             Table childList = nodes.findByFunctional(childTable.getId());
             String s;
             if (childList.getRow(0) == table) {
+                if (nodes.findByFunctional(childList.getRow(1).getId()).size() > 0){
+                    parseTable(childTable);
+                    return childTable.getKey();
+                }
                 s = mathOperation(table, nodes.findByFunctional(table.getFunctional()).getRow(1), nodes.findById(table.getFunctional()).getRow(0).getKey());
             } else {
                 s = mathOperation(nodes.findByFunctional(table.getFunctional()).getRow(0), table, nodes.findById(table.getFunctional()).getRow(0).getKey());
@@ -111,8 +224,9 @@ public class Simantic {
             nodes.removeRow(nodes.findByFunctional(childParent).getRow(0).getId());
 
             parseTable(parent);
-        }
 
+        }
+        return table.getKey();
     }
 
     Pattern pattern = Pattern.compile("[a-zA-Z]");
@@ -134,7 +248,7 @@ public class Simantic {
                 leftName = left.getKey();
                 leftValue = real.get(leftName);
             } else {
-//                System.exit(-1);
+// System.exit(-1);
                 System.out.println("problem in matcher");
             }
         } else {
@@ -194,7 +308,7 @@ public class Simantic {
                 return result;
             } else {
                 leftValue = Double.parseDouble(leftValue.toString()) + Double.parseDouble(rightValue.toString());
-//                real.put(leftName, (Double) leftValue);
+// real.put(leftName, (Double) leftValue);
                 result = leftValue.toString();
                 return result;
             }
