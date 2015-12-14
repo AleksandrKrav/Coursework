@@ -79,7 +79,7 @@ public class Simantic {
 
     int parentId;
 
-    void logic(RowOfTable table, RowOfTable parent){
+    void logic(RowOfTable table, RowOfTable parent) {
 
     }
 
@@ -88,24 +88,23 @@ public class Simantic {
         Table t = nodes.findByFunctional(table.getId());
         RowOfTable parent;
         if (t.size() > 0) {
-            if(nodes.findByFunctional(t.getRow(0).getId()).size() > 0){
+            if (nodes.findByFunctional(t.getRow(0).getId()).size() > 0) {
                 parseTable(t.getRow(0));
-            } else if(nodes.findByFunctional(t.getRow(1).getId()).size() > 0) {
+            } else if (nodes.findByFunctional(t.getRow(1).getId()).size() > 0) {
                 parseTable(t.getRow(1));
-            }
-            else parseTable(t.getRow(0));
+            } else parseTable(t.getRow(0));
         } else if (table.getFunctional() == funcBegin) {
             return;
         } else {
             RowOfTable childTable = nodes.findById(table.getFunctional()).getRow(0);
             Table childList = nodes.findByFunctional(childTable.getId());
             String s;
-            if (childList.getRow(0) == table){
-                 s = mathOperation(table, nodes.findByFunctional(table.getFunctional()).getRow(1), nodes.findById(table.getFunctional()).getRow(0).getKey());
-            }else {
-                 s = mathOperation(nodes.findByFunctional(table.getFunctional()).getRow(0), table, nodes.findById(table.getFunctional()).getRow(0).getKey());
+            if (childList.getRow(0) == table) {
+                s = mathOperation(table, nodes.findByFunctional(table.getFunctional()).getRow(1), nodes.findById(table.getFunctional()).getRow(0).getKey());
+            } else {
+                s = mathOperation(nodes.findByFunctional(table.getFunctional()).getRow(0), table, nodes.findById(table.getFunctional()).getRow(0).getKey());
             }
-            parent =  nodes.findById(table.getFunctional()).getRow(0);
+            parent = nodes.findById(table.getFunctional()).getRow(0);
             parent.setKey(s);
             int childParent = table.getFunctional();
             nodes.removeRow(nodes.findByFunctional(childParent).getRow(0).getId());
@@ -113,46 +112,6 @@ public class Simantic {
 
             parseTable(parent);
         }
-
-//        RowOfTable left = t.getRow(0);
-//        RowOfTable right = t.getRow(1);
-//
-
-//        Table leftTable = nodes.findByFunctional(left.getId());
-//        while (leftTable.size() != 0) {
-//            parseTable(leftTable, left.getKey());
-//        }
-//
-//        Table rightTable = nodes.findByFunctional(right.getId());
-//        while (rightTable.size() != 0) {
-//            parseTable(rightTable, right.getKey());
-//        }
-//
-//
-////        parentId = left.getFunctional();
-//        String newParent = mathOperation(left, right, key);
-//        Table ta = nodes.findById(parentId);
-//        int parentFunctional = ta.getRow(0).getFunctional();
-//        RowOfTable newRow = new RowOfTable(parentId, newParent, parentFunctional);
-//        nodes.updateRow(parentId, newRow);
-//        nodes.removeRow(left.getId());
-//        nodes.removeRow(right.getId());
-
-//        return;
-//        parentId = newRow.getFunctional();
-//        if (blockEnd == right.getId()){
-//            return;
-//        }
-//        Table t1 = nodes.findById(parentId);
-//        if (parentId == -1){
-//            return;
-//        }
-//        if (t1.getRow(0).getKey().equals("begin")){
-//            return;
-//        }
-//        Table temp = nodes.findByFunctional(parentId);
-//        parseTable(temp, t1.getRow(0).getKey());
-
 
     }
 
@@ -215,19 +174,44 @@ public class Simantic {
                 real.put(leftName, (Double) leftValue);
                 result = leftValue.toString();
                 return result;
+            } else if ((leftValue instanceof Integer) && (rightValue instanceof Double)) {
+                System.out.println("Неможливо присвоїти тип Integer до Double ");
+                System.exit(-1);
+            } else {
+                leftValue = Double.parseDouble(rightValue.toString());
+                result = leftValue.toString();
+                real.put(leftName, (Double) leftValue);
+                return result;
             }
         } else if (key.equals("+")) {
             if ((leftValue instanceof Integer) && (rightValue instanceof Integer)) {
                 leftValue = (Integer) leftValue + (Integer) rightValue;
-//                integer.put(leftName, (Integer) leftValue);
                 result = leftValue.toString();
                 return result;
             } else if ((leftValue instanceof Double) && (rightValue instanceof Double)) {
                 leftValue = (Double) leftValue + (Double) rightValue;
+                result = leftValue.toString();
+                return result;
+            } else {
+                leftValue = Double.parseDouble(leftValue.toString()) + Double.parseDouble(rightValue.toString());
 //                real.put(leftName, (Double) leftValue);
                 result = leftValue.toString();
                 return result;
             }
+        } else if (key.equals("*")) {
+            if ((leftValue instanceof Integer) && (rightValue instanceof Integer)) {
+                leftValue = (Integer) leftValue * (Integer) rightValue;
+                result = leftValue.toString();
+                return result;
+            } else {
+                leftValue = Double.parseDouble(leftValue.toString()) * Double.parseDouble(rightValue.toString());
+                result = leftValue.toString();
+                return result;
+            }
+        } else if (key.equals("/")) {
+            leftValue = Double.valueOf(leftValue.toString()) / Double.valueOf(rightValue.toString());
+            result = leftValue.toString();
+            return result;
         }
         return result;
     }

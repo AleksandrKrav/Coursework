@@ -11,7 +11,7 @@ public class Main {
 
         String string = "var a , b: integer; \n " + "  c: real; \n" +
                 "begin \n" +
-                "    a := a + 7 + a; \n" +
+                "    c := 20 / 20.0; \n" +
                 "  \n"+
 //                "    while ( (b + 6) < (a + (20.0 *3 + f)) ) do \n" +
 //                "        begin \n" +
