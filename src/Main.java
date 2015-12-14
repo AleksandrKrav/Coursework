@@ -18,12 +18,15 @@ public class Main {
 //                "            a:= 2;  \n" +
 //                "            b:= b + 2; \n" +
 //                "        end; \n" +
-                "for i:=1 to a do \n" +
-                "    c:= c + 5; \n" +
+//                "for i:=1 to a do \n" +
+//                "    c:= c + 5; \n" +
 
-//                "if ((90+30)/(7+5) < a) then \n" +
-//                "        b := a; \n" +
-                "        writeln(a);\n" +
+                "if (2 < a) then \n" +
+                "        b := a; \n" +
+                "else  \n"+
+                " a := b;  \n"+
+                "a := 20; \n" +
+                " writeln(a);\n" +
                 "end.";
 //        String string = "begin u := a + (b + (k*h) + o) + d + g; end.";
 //        String string = "begin u := a + b * (c + d * (e + f)); end.";
