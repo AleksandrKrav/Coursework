@@ -115,7 +115,7 @@ public class Simantic {
                 RowOfTable row = nodes.findByFunctional(idTo).getRow(0);
                 String finish = parseTo(row);
                 int idDO = idBeginTypes.get(i + 2);
-                i+=2;
+                i += 2;
                 for (int j = Integer.parseInt(start); j < Integer.parseInt(finish) + 1; j++) {
                     final ArrayList<RowOfTable> f = new ArrayList<>();
                     for (int l = 0; l < nodes2.size(); l++) {
@@ -184,6 +184,14 @@ public class Simantic {
         Double rightValue = Double.parseDouble(parseValue(right));
         if (condition.equals(Symbols.LESS.string)) {
             result = leftValue < rightValue;
+        } else if (condition.equals(Symbols.MORE.string)) {
+            result = leftValue > rightValue;
+        } else if (condition.equals(Symbols.MORE_EQUAL.string)) {
+            result = leftValue >= rightValue;
+        } else if (condition.equals(Symbols.LESS_EQUAL.string)) {
+            result = leftValue <= rightValue;
+        } else if (condition.equals((Symbols.NOT_EQUAL))) {
+            result = leftValue != rightValue;
         }
         return result;
     }

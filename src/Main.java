@@ -23,7 +23,7 @@ public class Main {
 
 //                "if ((90+30)/(7+5) < a) then \n" +
 //                "        b := a; \n" +
-//                "        sd := 6;\n" +
+                "        writeln(a);\n" +
                 "end.";
 //        String string = "begin u := a + (b + (k*h) + o) + d + g; end.";
 //        String string = "begin u := a + b * (c + d * (e + f)); end.";

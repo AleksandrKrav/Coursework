@@ -167,6 +167,18 @@ public class Parser {
                 addNode(parent);
             }
             return true;
+        } else if (current.equals(ReservedWords.WRITELN.string)) {
+            addNode(parent);
+            checkBracketExpr(pos - 1);
+            if (current.equals(Symbols.SEMICOLON.string)) {
+                commands.remove(pos);  // new
+                types.remove(pos);  //
+                current = commands.get(pos); //
+            } else {
+                System.out.println("Очікувалося \"" + Symbols.SEMICOLON.string + "\"");
+                System.exit(-1);
+            }
+            return true;
         } else {
             return false;
         }
@@ -271,11 +283,11 @@ public class Parser {
 
     public boolean test(int parent) {
         if (current.equals(Symbols.PLUS.string) || current.equals(Symbols.MINUS.string) ||
-                    current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
+                current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
 
 //            if (current.equals(Symbols.PLUS.string) || current.equals(Symbols.MINUS.string)) {
-                nodes.getRow(forSum.get(forSum.size() - 1)).setParent(pos); //
-                forSum.set(forSum.size() - 1, pos);
+            nodes.getRow(forSum.get(forSum.size() - 1)).setParent(pos); //
+            forSum.set(forSum.size() - 1, pos);
 //            }
 
             addNode(parent);
@@ -286,8 +298,8 @@ public class Parser {
 //            }
 
             if (!checkTerm(pos - 1)) {
-                    System.out.println("Невірний вираз test");
-                    System.exit(-1);
+                System.out.println("Невірний вираз test");
+                System.exit(-1);
             } else {
                 if (current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
                     nodes.getRow(pos - 1).setParent(pos);
@@ -375,7 +387,6 @@ public class Parser {
             System.exit(-1);
         }
     }
-
 
 
     public void checkVar(int parent) {
