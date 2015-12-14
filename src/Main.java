@@ -1,18 +1,16 @@
 import analyzers.LexicalAnalyser;
 import analyzers.Parser;
-import analyzers.Simantic;
 import enums.Types;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class Main {
 
-    public static void main(String args[]) {
+        public static void main(String args[]) {
 
-        String string = "var a , b: integer; \n " + "  c: real; \n" +
+        String string = "var a, b: integer; \n " + "  c: real; \n" +
                 "begin \n" +
-                "    a := a + 7 + a; \n" +
-                "  \n"+
+//                "    a := a + 1; \n" +
 //                "    while ( (b + 6) < (a + (20.0 *3 + f)) ) do \n" +
 //                "        begin \n" +
 //                "            a:=4;  \n" +
@@ -28,6 +26,7 @@ public class Main {
 //        String string = "begin u := a + b * (c + d * (e + f)); end.";
 //        String string = "begin for a:= 1 to n to begin for b:=1 to n do begin a:=m; end; end; end.";
 //        String string = "var a, b: integer; c: real; begin if ( a > b) then if (c = d) then a := b; end.";
+
         ArrayList<String> commands;
         ArrayList<Types> types;
 
@@ -37,9 +36,6 @@ public class Main {
 
         Parser parser = new Parser(commands, types);
         parser.parse();
-        Simantic s = new Simantic(parser.getNodes());
-        s.simanticParse();
-
 
 
 //        System.out.println();
