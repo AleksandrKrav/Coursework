@@ -8,6 +8,7 @@ import table.Table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,9 +19,11 @@ public class Simantic {
     Map<String, Double> real = new HashMap<>();
     Map<String, Integer> integer = new HashMap<>();
     Table nodes;
+    Table nodes2;
 
-    public Simantic(Table nodes) {
+    public Simantic(Table nodes, Table nodes2) {
         this.nodes = nodes;
+        this.nodes2 = nodes2;
     }
 
     ArrayList<Integer> root = new ArrayList<>();
@@ -50,28 +53,46 @@ public class Simantic {
         }
     }
 
+
     public void simanticParse(int subParentId) {
+
         idBeginTypes = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
             if (nodes.getRow(i).getFunctional() == subParentId) {
                 idBeginTypes.add(i);
             }
         }
-
+        final ArrayList<RowOfTable> r = new ArrayList<>();
+        for (int i = 0; i < nodes2.size(); i++) {
+            r.add(new RowOfTable(nodes2.getRow(i).getId(), nodes2.getRow(i).getKey(), nodes2.getRow(i).getFunctional()));
+        }
+        final Table t2 = new Table(r);
+//        t2 = nodes;
         for (int i = 0; i < idBeginTypes.size(); i += 2) {
             int d = subParentId;
             String k = "";
             boolean b = false;
+
             if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals("while")) {
-                b = parseContition(nodes.findByFunctional(idBeginTypes.get(i)).getRow(0));
-                System.out.println(b);
-                d = i + 1;
-                if (nodes.findById(idBeginTypes.get(d) + 1).getRow(0).getKey().equals("begin")) {
-                    for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
-                        k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
+                while (b = parseContition(nodes.findByFunctional(idBeginTypes.get(i)).getRow(0))) {
+                    final ArrayList<RowOfTable> f = new ArrayList<>();
+                    for (int l = 0; l < nodes2.size(); l++) {
+                        f.add(new RowOfTable(t2.getRow(l).getId(), t2.getRow(l).getKey(), t2.getRow(l).getFunctional()));
                     }
-                } else {
-                    parseTable2(nodes.findByFunctional(idBeginTypes.get(d)).getRow(0), idBeginTypes.get(d));
+
+                    nodes = new Table(f);
+//                    System.out.println(b);
+                    d = i + 1;
+                    if (nodes.findById(idBeginTypes.get(d) + 1).getRow(0).getKey().equals("begin")) {
+                        for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
+                            k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
+                        }
+                    } else {
+                        parseTable2(nodes.findByFunctional(idBeginTypes.get(d)).getRow(0), idBeginTypes.get(d));
+                    }
+//                    for (Map.Entry<String, Integer> m : integer.entrySet()) {
+//                        System.out.println(m.getKey() + " " + m.getValue());
+//                    }
 
                 }
             } else if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals("if")) {
@@ -86,9 +107,35 @@ public class Simantic {
                     parseTable2(nodes.findByFunctional(idBeginTypes.get(d)).getRow(0), idBeginTypes.get(d));
 
                 }
+            }
+            if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals("for")) {
+                Table tFor = nodes.findByFunctional(idBeginTypes.get(i));
+                String start = parseFor(tFor.getRow(0));
+                int idTo = idBeginTypes.get(i + 1);
+                RowOfTable row = nodes.findByFunctional(idTo).getRow(0);
+                String finish = parseTo(row);
+                int idDO = idBeginTypes.get(i + 2);
+                i+=2;
+                for (int j = Integer.parseInt(start); j < Integer.parseInt(finish) + 1; j++) {
+                    final ArrayList<RowOfTable> f = new ArrayList<>();
+                    for (int l = 0; l < nodes2.size(); l++) {
+                        f.add(new RowOfTable(t2.getRow(l).getId(), t2.getRow(l).getKey(), t2.getRow(l).getFunctional()));
+                    }
+                    nodes = new Table(f);
+                    d = idDO;
+                    if (nodes.findById(d + 1).getRow(0).getKey().equals("begin")) {
+                        for (int l = 0; l < nodes.findByFunctional(d + 1).size(); l += 2) {
+                            k = parseTable2(nodes.findByFunctional(d + 1).getRow(l), d + 1);
+                        }
+                    } else {
+                        parseTable2(nodes.findByFunctional(d).getRow(0), d);
+
+                    }
+                }
             } else {
                 k = parseTable(nodes.findById(idBeginTypes.get(i)).getRow(0));
             }
+
 //                System.out.println(k);
         }
         for (Map.Entry<String, Integer> m : integer.entrySet()) {
@@ -115,6 +162,17 @@ public class Simantic {
     void logic(RowOfTable table, RowOfTable parent) {
 
     }
+
+    String parseFor(RowOfTable rowFor) {
+        Table tFor = nodes.findByFunctional(rowFor.getId());
+        return parseValue(tFor.getRow(1).getKey());
+    }
+
+    String parseTo(RowOfTable rowFor) {
+//        Table tFor = nodes.findByFunctional(rowFor.getId());
+        return parseValue(rowFor.getKey());
+    }
+
 
     boolean parseContition(RowOfTable conditionRow) {
         boolean result = false;
@@ -172,7 +230,7 @@ public class Simantic {
             Table childList = nodes.findByFunctional(childTable.getId());
             String s;
             if (childList.getRow(0) == table) {
-                if (nodes.findByFunctional(childList.getRow(1).getId()).size() > 0){
+                if (nodes.findByFunctional(childList.getRow(1).getId()).size() > 0) {
                     parseTable2(childTable, finish);
                     return childTable.getKey();
                 }
@@ -209,7 +267,7 @@ public class Simantic {
             Table childList = nodes.findByFunctional(childTable.getId());
             String s;
             if (childList.getRow(0) == table) {
-                if (nodes.findByFunctional(childList.getRow(1).getId()).size() > 0){
+                if (nodes.findByFunctional(childList.getRow(1).getId()).size() > 0) {
                     parseTable(childTable);
                     return childTable.getKey();
                 }
