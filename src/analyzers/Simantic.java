@@ -5,6 +5,9 @@ import enums.TypesOfNumber;
 import table.RowOfTable;
 import table.Table;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +23,7 @@ public class Simantic {
     Table nodes;
     Table nodes2;
     ArrayList<Integer> root = new ArrayList<>();
-    ArrayList<RowOfTable> tree = new ArrayList<>();
+    final ArrayList<RowOfTable> tree = new ArrayList<>();
     ArrayList<Integer> idVarTypes = new ArrayList<>();
     ArrayList<Integer> idBeginTypes = new ArrayList<>();
     int blockEnd;
@@ -43,7 +46,8 @@ public class Simantic {
             if (nodes.getRow(i).getFunctional() == -1) {
                 root.add(i);
             }
-            tree.add(nodes.getRow(i));
+            RowOfTable rot = new RowOfTable(nodes.getRow(i).getId(), nodes.getRow(i).getKey(), nodes.getRow(i).getFunctional() );
+            tree.add(rot);
         }
 
         funcBegin = root.get(1);
@@ -92,9 +96,9 @@ public class Simantic {
                     nodes = new Table(f);
 //                    System.out.println(b);
 
-                    if (nodes.findById(d+1).getRow(0).getKey().equals("begin")) {
+                    if (nodes.findById(d + 1).getRow(0).getKey().equals("begin")) {
 //                        for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
-                            simanticParse(d+1);
+                        simanticParse(d + 1);
 //                            k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
 //                        }
                     } else {
@@ -112,7 +116,7 @@ public class Simantic {
                 if (b) {
                     if (nodes.findById(idBeginTypes.get(d) + 1).getRow(0).getKey().equals("begin")) {
 //                        for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
-                            simanticParse(d + 1);
+                        simanticParse(d + 1);
 //                            k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
 //                        }
                     } else {
@@ -395,14 +399,9 @@ public class Simantic {
                 real.put(leftName, (Double) leftValue);
                 result = leftValue.toString();
                 return result;
-            } else if ((leftValue instanceof Integer) && (rightValue instanceof Double)) {
-                System.out.println("Неможливо присвоїти тип Integer до Double ");
-                System.exit(-1);
             } else {
-                leftValue = Double.parseDouble(rightValue.toString());
-                result = leftValue.toString();
-                real.put(leftName, (Double) leftValue);
-                return result;
+                System.out.println("Невірне приведення типів ");
+                System.exit(-1);
             }
         } else if (key.equals("+")) {
             if ((leftValue instanceof Integer) && (rightValue instanceof Integer)) {
@@ -415,7 +414,6 @@ public class Simantic {
                 return result;
             } else {
                 leftValue = Double.parseDouble(leftValue.toString()) + Double.parseDouble(rightValue.toString());
-// real.put(leftName, (Double) leftValue);
                 result = leftValue.toString();
                 return result;
             }
@@ -433,12 +431,106 @@ public class Simantic {
             leftValue = Double.valueOf(leftValue.toString()) / Double.valueOf(rightValue.toString());
             result = leftValue.toString();
             return result;
+        }else if (key.equals("mod")) {
+            if ((leftValue instanceof Integer) && (rightValue instanceof Integer)) {
+                leftValue = (Integer) leftValue % (Integer) rightValue;
+                result = leftValue.toString();
+                return result;
+            }else{
+                System.out.println("Невірний тип даних для виконная операції mod");
+                System.exit(-1);
+            }
         }
         return result;
     }
 
 
-    public void printResult(){
+    public void printResult(String fileName) {
+        File file = new File(fileName);
+        StringBuilder sb = new StringBuilder();
+        String s;
+        for (int i = 0; i < tree.size(); i++) {
+            s = tree.get(i).getKey();
+            if (s.equals(":")) {
+                sb.append("тип " + " ");
+            } else if (s.equals("integer")) {
+                sb.append("integer ");
+            } else if (s.equals(";")) {
+                sb.append("\n");
+            } else if (s.equals("real")) {
+                sb.append("real ");
+            } else if (s.equals("begin")) {
+                if (tree.get(i).getFunctional() == -1) {
+                    sb.append("Початок програми" + "\n");
+                } else sb.append("Початок блоку" + "\n");
+            } else if (s.equals("end")) {
+                if (tree.get(i).getFunctional() == -1) {
+                    sb.append("Кінець програми" + "\n");
+                } else sb.append("Кінець блоку");
+            } else if (s.equals("writeln")){
+                sb.append("Вивід на екран: " + parseValue(tree.get(i+1).getKey()) + "\n");
+                i++;
+            } else if (s.equals(Symbols.ASSIGN.string)){
+                sb.append("присвоїти ");
+            } else if (s.equals("+")){
+                sb.append("додати ");
+            } else if (s.equals("-")){
+                sb.append("відняти ");
+            } else if (s.equals("/")){
+                sb.append("поділити ");
+            } else if (s.equals("*")){
+                sb.append("помножити ");
+            } else if (s.equals("=")){
+                sb.append("дорівнює ");
+            } else if (s.equals(">")){
+                sb.append("більше ");
+            }  else if (s.equals("<")){
+                sb.append("менше ");
+            } else if (s.equals(">=")){
+                sb.append("більше або дорівнює ");
+            } else if (s.equals("<=")){
+                sb.append("менше або дорівнює ");
+            } else if (s.equals("<>")){
+                sb.append("не дорівнює ");
+            } else if (s.equals("if")){
+                sb.append("Якщо ");
+            } else if (s.equals("then")){
+                sb.append("то \n\t");
+            } else if (s.equals("else")){
+                sb.append("інакше \n");
+            } else if (s.equals("for")){
+                sb.append("від ");
+            } else if (s.equals("to")){
+                sb.append("до ");
+            } else if (s.equals("do")){
+                sb.append("виконати \n");
+            } else if (s.equals("while")){
+                sb.append("доки ");
+            } else if (s.equals("readln")){
+                sb.append("зчитати з консолі змінну : ");
+            } else if(s.equals(".")) {
+                continue;
+            } else if(s.equals("var")) {
+                sb.append("Змінні : \n");
+            }else{
+             sb.append(s + " ");}
+        }
 
+
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            PrintWriter out = new PrintWriter(file.getAbsoluteFile());
+
+            try {
+                out.print(sb.toString());
+            } finally {
+                out.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -237,7 +237,7 @@ public class Parser {
     public boolean checkSum(int parent) {
         if (checkTerm(parent)) {
             if (current.equals(Symbols.PLUS.string) || current.equals(Symbols.MINUS.string) ||
-                    current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
+                    current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)|| current.equals(Symbols.MOD.string)) {
 
                 if (startInBracket != 0) { //kostil'
                     nodes.getRow(startInBracket).setParent(pos);
@@ -257,7 +257,7 @@ public class Parser {
                     System.out.println("Невірний вираз Sum1");
                     System.exit(-1);
                 } else {
-                    if (current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
+                    if (current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)|| current.equals(Symbols.MOD.string)) {
                         nodes.getRow(pos - 1).setParent(pos);
                         checkMulti(pos - 2);
                     }
@@ -283,7 +283,7 @@ public class Parser {
 
     public boolean test(int parent) {
         if (current.equals(Symbols.PLUS.string) || current.equals(Symbols.MINUS.string) ||
-                current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
+                current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)|| current.equals(Symbols.MOD.string)) {
 
 //            if (current.equals(Symbols.PLUS.string) || current.equals(Symbols.MINUS.string)) {
             nodes.getRow(forSum.get(forSum.size() - 1)).setParent(pos); //
@@ -301,7 +301,7 @@ public class Parser {
                 System.out.println("Невірний вираз test");
                 System.exit(-1);
             } else {
-                if (current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
+                if (current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)|| current.equals(Symbols.MOD.string)) {
                     nodes.getRow(pos - 1).setParent(pos);
                     checkMulti(pos - 2);
                 }
@@ -314,7 +314,7 @@ public class Parser {
     }
 
     public boolean checkMulti(int parent) {
-        if (current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)) {
+        if (current.equals(Symbols.MULTI.string) || current.equals(Symbols.DIV.string)|| current.equals(Symbols.MOD.string)) {
 
 //            if (forMulti.size() != 0) {
 //                nodes.getRow(forMulti.get(forMulti.size() - 1)).setParent(pos);
