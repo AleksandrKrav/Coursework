@@ -11,17 +11,16 @@ public class Main {
 
         String string = "var a , b: integer; \n " + "  c: real; \n" +
                 "begin \n" +
-                "    a := 4; \n" +
+                "    a := i; \n" +
 //                "  \n"+
-                "    while ( b < a ) do \n" +
+//                "           if (b < 4) then \n" +
 //                "            a:= 2;  \n" +
 //                "for i:=1 to a do \n" +
-                "    begin \n" +
-
-                "            b:= b + 2; \n" +
-                "           if (3 < i) then \n" +
-                "               c:= c + 5; \n" +
-                "    end; \n" +
+//                "    begin \n" +
+//                "    while ( i < a ) do \n" +
+//                "            b:= b + 2; \n" +
+//                "                \n" +
+//                "    end; \n" +
 
 //                "        b := a; \n" +
 //                "else  \n"+
@@ -44,7 +43,8 @@ public class Main {
         parser.parse();
         Simantic s = new Simantic(parser.getNodes(), parser.getNodes());
         s.intialization();
-        s.simanticParse(10);
+        s.simanticParse(s.getFuncBegin());
+        s.printResult();
 //        System.out.println(s.simanticParse());
 //        System.out.println(s.simanticParse());
 

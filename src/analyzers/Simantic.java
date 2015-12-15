@@ -20,10 +20,16 @@ public class Simantic {
     Table nodes;
     Table nodes2;
     ArrayList<Integer> root = new ArrayList<>();
+    ArrayList<RowOfTable> tree = new ArrayList<>();
     ArrayList<Integer> idVarTypes = new ArrayList<>();
     ArrayList<Integer> idBeginTypes = new ArrayList<>();
-    int blockEnd = 10;
-    int parentId;
+    int blockEnd;
+
+    public int getFuncBegin() {
+        return funcBegin;
+    }
+
+    //    int parentId;
     Pattern pattern = Pattern.compile("[a-zA-Z]");
     Matcher matcher;
 
@@ -37,7 +43,9 @@ public class Simantic {
             if (nodes.getRow(i).getFunctional() == -1) {
                 root.add(i);
             }
+            tree.add(nodes.getRow(i));
         }
+
         funcBegin = root.get(1);
         for (int i = 0; i < nodes.size(); i++) {
             if (nodes.getRow(i).getFunctional() == 0) {
@@ -73,7 +81,9 @@ public class Simantic {
             boolean b = false;
 
             if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals("while")) {
-                while (b = parseContition(nodes.findByFunctional(idBeginTypes.get(i)).getRow(0))) {
+                int whileId = idBeginTypes.get(i);
+                d = idBeginTypes.get(i + 1);
+                while (b = parseContition(nodes.findByFunctional(whileId).getRow(0))) {
                     final ArrayList<RowOfTable> f = new ArrayList<>();
                     for (int l = 0; l < nodes2.size(); l++) {
                         f.add(new RowOfTable(t2.getRow(l).getId(), t2.getRow(l).getKey(), t2.getRow(l).getFunctional()));
@@ -81,14 +91,14 @@ public class Simantic {
 
                     nodes = new Table(f);
 //                    System.out.println(b);
-                    d = i + 1;
-                    if (nodes.findById(idBeginTypes.get(d) + 1).getRow(0).getKey().equals("begin")) {
-                        for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
-                            simanticParse(d + 1);
+
+                    if (nodes.findById(d+1).getRow(0).getKey().equals("begin")) {
+//                        for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
+                            simanticParse(d+1);
 //                            k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
-                        }
+//                        }
                     } else {
-                        parseTable2(nodes.findByFunctional(idBeginTypes.get(d)).getRow(0), idBeginTypes.get(d));
+                        parseTable2(nodes.findByFunctional(d).getRow(0), d);
                     }
 //                    for (Map.Entry<String, Integer> m : integer.entrySet()) {
 //                        System.out.println(m.getKey() + " " + m.getValue());
@@ -101,10 +111,10 @@ public class Simantic {
                 d = i + 1;
                 if (b) {
                     if (nodes.findById(idBeginTypes.get(d) + 1).getRow(0).getKey().equals("begin")) {
-                        for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
+//                        for (int j = 0; j < nodes.findByFunctional(idBeginTypes.get(d) + 1).size(); j += 2) {
                             simanticParse(d + 1);
 //                            k = parseTable2(nodes.findByFunctional(idBeginTypes.get(d) + 1).getRow(j), idBeginTypes.get(d) + 1);
-                        }
+//                        }
                     } else {
                         parseTable2(nodes.findByFunctional(idBeginTypes.get(d)).getRow(0), idBeginTypes.get(d));
                     }
@@ -150,12 +160,11 @@ public class Simantic {
                         }
                     } else {
                         parseTable2(nodes.findByFunctional(d).getRow(0), d);
-
                     }
                 }
                 local.remove(cond[0]);
             } else if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals(":=")) {
-                k = parseTable(nodes.findById(idBeginTypes.get(i)).getRow(0));
+                k = parseTable2(nodes.findById(idBeginTypes.get(i)).getRow(0), subParentId);
             } else if (nodes.findById(idBeginTypes.get(i)).getRow(0).getKey().equals("writeln")) {
                 System.out.println(parseValue(nodes.findByFunctional(idBeginTypes.get(i)).getRow(0).getKey()));
                 i -= 1;
@@ -238,7 +247,6 @@ public class Simantic {
                 leftName = value;
                 leftValue = real.get(leftName);
             } else {
-// System.exit(-1);
                 System.out.println("problem in matcher");
             }
         } else {
@@ -336,12 +344,15 @@ public class Simantic {
             if (integer.containsKey(left.getKey())) { // есть в мапе интежеров
                 leftName = left.getKey();
                 leftValue = integer.get(leftName);
+            } else if (local.containsKey(left.getKey())) {
+                leftName = left.getKey();
+                leftValue = local.get(leftName);
             } else if (real.containsKey(left.getKey())) { // есть в мапе real
                 leftName = left.getKey();
                 leftValue = real.get(leftName);
             } else {
-// System.exit(-1);
-                System.out.println("problem in matcher");
+                leftName = left.getKey();
+                System.out.println("Невідома змінна \"" + leftName + "\"");
             }
         } else {
             if (left.getKey().contains(".")) {
@@ -355,11 +366,15 @@ public class Simantic {
             if (integer.containsKey(right.getKey())) { // есть в мапе интежеров
                 rightName = right.getKey();
                 rightValue = integer.get(rightName);
+            } else if (local.containsKey(right.getKey())) {
+                rightName = right.getKey();
+                rightValue = local.get(rightName);
             } else if (real.containsKey(right.getKey())) { // есть в мапе real
                 rightName = right.getKey();
                 rightValue = real.get(rightName);
             } else {
-                System.exit(-1);
+                rightName = right.getKey();
+                System.out.println("Невідома змінна - \"" + rightName + "\"");
             }
         } else {
             if (right.getKey().contains(".")) {
@@ -423,9 +438,7 @@ public class Simantic {
     }
 
 
-    void ifCycle(String leftExp, String rightExp, String condition) {
-        if (condition.equals(Symbols.EQUAL)) {
+    public void printResult(){
 
-        }
     }
 }
