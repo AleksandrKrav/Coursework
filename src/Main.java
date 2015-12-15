@@ -13,20 +13,21 @@ public class Main {
                 "begin \n" +
                 "    a := 4; \n" +
 //                "  \n"+
-//                "    while ( b < a ) do \n" +
-//                "        begin \n" +
+                "    while ( b < a ) do \n" +
 //                "            a:= 2;  \n" +
-//                "            b:= b + 2; \n" +
-//                "        end; \n" +
 //                "for i:=1 to a do \n" +
-//                "    c:= c + 5; \n" +
+                "    begin \n" +
 
-                "if (2 < a) then \n" +
-                "        b := a; \n" +
-                "else  \n"+
-                " a := b;  \n"+
-                "a := 20; \n" +
-                " writeln(a);\n" +
+                "            b:= b + 2; \n" +
+                "           if (3 < i) then \n" +
+                "               c:= c + 5; \n" +
+                "    end; \n" +
+
+//                "        b := a; \n" +
+//                "else  \n"+
+//                " a := b;  \n"+
+//                "a := 20; \n" +
+//                " writeln(a);\n" +
                 "end.";
 //        String string = "begin u := a + (b + (k*h) + o) + d + g; end.";
 //        String string = "begin u := a + b * (c + d * (e + f)); end.";
