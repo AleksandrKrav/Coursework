@@ -3,7 +3,7 @@ package analyzers;
 import enums.ReservedWords;
 import enums.Symbols;
 import enums.Types;
-import enums.TypesOfNumber;
+//import enums.TypesOfNumber;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class LexicalAnalyser {
 
     public ReservedWords[] reservedWords = ReservedWords.values();
-    public TypesOfNumber[] typesOfNumbers = TypesOfNumber.values();
+//    public TypesOfNumber[] typesOfNumbers = TypesOfNumber.values();
     public Symbols[] symbols = Symbols.values();
 
     private String string;
@@ -82,12 +82,17 @@ public class LexicalAnalyser {
             }
         }
 
-        for (TypesOfNumber type : typesOfNumbers) {
-            if (command.equals(type.string)) {
-                types.add(Types.NUMBER_TYPE);
-                return true;
-            }
+        if (command.equals("real") || command.equals("integer")){
+            types.add(Types.NUMBER_TYPE);
+            return true;
         }
+
+//        for (TypesOfNumber type : typesOfNumbers) {
+//            if (command.equals(type.string)) {
+//                types.add(Types.NUMBER_TYPE);
+//                return true;
+//            }
+//        }
 
         for (Symbols symbol : symbols) {
             if (command.equals(symbol.string)) {
@@ -101,7 +106,7 @@ public class LexicalAnalyser {
             try {
                 Double.parseDouble(command);
             } catch (NumberFormatException e) {
-                System.out.println("Невірно введене число");
+                System.out.println("Невірно введено змінна/число");
                 System.exit(-1);
             }
             types.add(Types.NUMBER);

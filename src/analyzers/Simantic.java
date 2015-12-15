@@ -1,7 +1,7 @@
 package analyzers;
 
 import enums.Symbols;
-import enums.TypesOfNumber;
+//import enums.TypesOfNumber;
 import table.RowOfTable;
 import table.Table;
 
@@ -33,7 +33,7 @@ public class Simantic {
     }
 
     //    int parentId;
-    Pattern pattern = Pattern.compile("[a-zA-Z]");
+    Pattern pattern = Pattern.compile("[a-zA-Z]+");
     Matcher matcher;
 
     public Simantic(Table nodes, Table nodes2) {
@@ -158,10 +158,10 @@ public class Simantic {
                     nodes = new Table(f);
                     d = idDO;
                     if (nodes.findById(d + 1).getRow(0).getKey().equals("begin")) {
-                        for (int l = 0; l < nodes.findByFunctional(d + 1).size(); l += 2) {
+//                        for (int l = 0; l < nodes.findByFunctional(d + 1).size(); l += 2) {
                             simanticParse(d + 1);
 //                            k = parseTable2(nodes.findByFunctional(d + 1).getRow(l), d + 1);
-                        }
+//                        }
                     } else {
                         parseTable2(nodes.findByFunctional(d).getRow(0), d);
                     }
@@ -190,7 +190,7 @@ public class Simantic {
         String type = t.getRow(t.size() - 1).getKey();
         for (int i = 0; i < t.size() - 1; i++) {
             String name = t.getRow(i).getKey();
-            if (type.equals(TypesOfNumber.REAL.string))
+            if (type.equals("real"))
                 real.put(name, 0.0);
             else
                 integer.put(name, 0);
@@ -251,7 +251,8 @@ public class Simantic {
                 leftName = value;
                 leftValue = real.get(leftName);
             } else {
-                System.out.println("problem in matcher");
+                System.out.println("невідома змінна " + value);
+                System.exit(-1);
             }
         } else {
             if (value.contains(".")) {

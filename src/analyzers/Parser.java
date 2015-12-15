@@ -13,11 +13,9 @@ public class Parser {
         return nodes;
     }
 
-    private Table
-            nodes = new Table();
+    private Table nodes = new Table();
     private ArrayList<String> commands;
     private ArrayList<Types> types;
-
     private String current;
     private int pos = 0;
     private int temp = 0;
@@ -221,7 +219,7 @@ public class Parser {
 
                 addNode(parent);
                 if (!checkSum(pos - 1)) {
-                    System.out.println("Невірний вираз Test");
+                    System.out.println("Невірний вираз логічних операцій");
                     System.exit(-1);
                 }
             } else {
@@ -229,7 +227,7 @@ public class Parser {
                 System.exit(-1);
             }
         } else {
-            System.out.println("Невірний вираз Test");
+            System.out.println("Невірний вираз логічної операції");
             System.exit(-1);
         }
     }

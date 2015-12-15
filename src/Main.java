@@ -9,16 +9,21 @@ public class Main {
 
     public static void main(String args[]) {
 
-        String string = "var a , b: integer; \n " + "  c: real; \n" +
+        String string = "var a , b, ab: integer; \n " + "  c: real; \n" +
                 "begin \n" +
-//                "    a := 3; \n" +
+                "    b := 3; \n" +
+                "    ab := 2; \n" +
+//                "2; \n" +
 ////                "  \n"+
-//                "    if (b < 4) then \n" +
-//                "       a := 2;  \n" +
-//                "for i:=1 to a do \n" +
-//                "  begin \n" +
-//                "    b := b +1; \n" +
-//                "  end; \n" +
+                "for i:=1 to a do \n" +
+                "  begin \n" +
+                "    if (b+ 2/4 < 4) then \n" +
+                "       begin  \n" +
+                "       while (a < 6.7) do \n" +
+                "       writeln(ab); \n" +
+                "       end;  \n" +
+                "    b := b +1; \n" +
+                "  end; \n" +
 //                "while ( i < a ) do \n" +
 //                "  b:= b + 2; \n" +
 //                "                \n" +
@@ -26,7 +31,7 @@ public class Main {
 //                "b := a; \n" +
 //                " else  \n"+
 //                "c := a;  \n"+
-                "a := 5 mod 2; \n" +
+//                "a := (b); \n" +
                 "writeln(a);\n" +
                 "end.";
         ArrayList<String> commands;
@@ -42,5 +47,6 @@ public class Main {
         s.intialization();
         s.simanticParse(s.getFuncBegin());
         s.printResult("file.txt");
+
     }
 }
